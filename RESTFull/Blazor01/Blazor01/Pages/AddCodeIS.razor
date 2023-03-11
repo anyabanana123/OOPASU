@@ -1,0 +1,22 @@
+﻿@page "/AddCodeIS"
+@using System.Net.Http
+@inject HttpClient Http
+@using System.Net.Http.Json
+@using System.Threading.Tasks
+@using RESTFull.Domain
+
+<PageTitle>Добавление кодов</PageTitle>
+
+<h1>Добавление нового кода</h1>
+
+<AddCodeISComponent OnAddCodeIS="ToMessage" />
+
+@code {
+    string Message { get; set; } = "";
+
+    void ToMessage(string message1)
+    {
+        Message = message1;
+        Console.WriteLine(Message);
+    }
+}

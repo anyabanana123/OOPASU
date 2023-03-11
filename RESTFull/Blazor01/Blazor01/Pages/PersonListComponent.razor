@@ -1,0 +1,77 @@
+﻿
+@using System.Net.Http
+@inject HttpClient Http
+@using System.Net.Http.Json
+@using System.Threading.Tasks
+@using RESTFull.Domain.Model
+@using Microsoft.AspNetCore.Components.Web
+@using RESTFull.Domain
+
+<h3>Список пользователей</h3>
+<p>@MessageAdd</p>
+
+@if (fulfil && persons == null)
+{
+    <p>Пользователи отсутствуют.</p>
+}
+else if(!fulfil && persons == null)
+{
+    <p>Идет загрузка...</p>
+}
+
+@if(persons != null)
+{
+    <table>
+        <tr>
+            <th>ID</th>            
+            <th>Фамилия</th>
+            <th>Имя</th>
+            <th>Отчество</th>
+            <th>Дата рождения</th>
+            <th>Город</th>
+        </tr>
+        @foreach (var person in persons)
+        {
+            <tr>
+                <td>@person.ID</td>
+                <td>@person.Familia</td>
+                <td>@person.Name</td>
+                <td>@person.Otchestvo</td>
+                <td>@person.DateBirth</td>
+                <td>@person.City</td>
+                <td><a class="custom-button" href="EditPerson/@person.ID">Изменить данные</a></td>
+                <td><a class="custom-button" href="AddPerson">Добавить пользователя</a></td>
+                <td><button class="delete-button" @onclick="() => DeletePerson(person.ID)">Удалить человека</button></td>
+
+            </tr>
+        }
+    </table>
+    
+}
+
+@code {
+    [Parameter]
+   public string MessageAdd { get; set; }
+
+    private IEnumerable<Person> persons;
+    private bool fulfil = false;
+
+    protected override async Task OnParametersSetAsync() =>
+        persons = await Http.GetFromJsonAsync<Person[]>
+            ("https://localhost:7046/api/Persons");
+
+    protected override async Task OnInitializedAsync()  
+    {
+        persons = await Http.GetFromJsonAsync<IEnumerable<Person>>
+            ("https://localhost:7046/api/Persons");
+        fulfil = true;
+    }
+    
+    public EventCallback<string> OnDeletePerson { get; set; }
+
+    private async Task DeletePerson(int ID)
+    {
+        Console.WriteLine(ID);
+        await Http.DeleteAsync("https://localhost:7046/api/Persons/" + ID);
+    }
+}
